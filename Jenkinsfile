@@ -9,7 +9,10 @@ pipeline {
             }
         }
         stage('DeployToStaging') {
-                        steps {
+            when {
+                branch 'master'
+            }
+            steps {
                 withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     sshPublisher(
                         failOnError: true,
@@ -26,7 +29,7 @@ pipeline {
                                         sourceFiles: 'dist/trainSchedule.zip',
                                         removePrefix: 'dist/',
                                         remoteDirectory: '/tmp',
-                                        execCommand: 'unzip /tmp/trainSchedule.zip -d /opt/train-schedule && mkdir /directory'
+                                        execCommand: 'unzip /tmp/trainSchedule.zip -d /opt/train-schedule && mkdir /dir'
                                     )
                                 ]
                             )
@@ -36,7 +39,10 @@ pipeline {
             }
         }
         stage('DeployToProduction') {
-                        steps {
+            when {
+                branch 'master'
+            }
+            steps {
                 input 'Does the staging environment look OK?'
                 milestone(1)
                 withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
